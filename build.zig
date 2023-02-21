@@ -11,7 +11,7 @@ pub fn build(b: *std.build.Builder) void {
 
     const build_opts = b.addOptions();
     // Sets whether to build targeting float-128 or not
-    build_opts.addOption(bool, "f128", false);
+    //build_opts.addOption(bool, "f128", false);
     // Sets whether or not gnu/mp is used
     //build_opts.addOption(bool, "gmp", false);
 
