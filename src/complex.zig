@@ -118,4 +118,13 @@ test "Complex addition f128 test?" {
     try testing.expect(a.eq(&c));
 }
 
+test "Complex magnitude f64 test" {
+    const C64 = makeComplex(f64);
+    var a = C64.init(2, 0);
+    var b = C64.init(0, 2);
+    try testing.expect(a.magnitude() == 2);
+    try testing.expect(b.magnitude() == 2);
+
+}
+
 // end math.zig
