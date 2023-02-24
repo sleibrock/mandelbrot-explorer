@@ -53,7 +53,7 @@ pub fn makeComplex(comptime T: anytype) type {
 
         pub fn magnitude(s: *Self) T {
             // sqrt(a**2 + b**2) is the absolute value/magnitude of C
-            return math.sqrt((s.real*s.real) + (s.imag*s.imag));
+            return math.sqrt(s.square());
         }
 
         pub fn eq(s: *Self, o: *Self) bool {
@@ -110,10 +110,10 @@ test "Complex division f64 test" {
 }
 
 test "Complex addition f128 test?" {
-    const C64 = makeComplex(f128);
-    var a = C64.init(5, 3);
-    var b = C64.init(7, 4);
-    var c = C64.init(12, 7);
+    const C128 = makeComplex(f128);
+    var a = C128.init(5, 3);
+    var b = C128.init(7, 4);
+    var c = C128.init(12, 7);
     a.add(&b);
     try testing.expect(a.eq(&c));
 }
@@ -122,9 +122,10 @@ test "Complex magnitude f64 test" {
     const C64 = makeComplex(f64);
     var a = C64.init(2, 0);
     var b = C64.init(0, 2);
+    var c = C64.init(5, 5);
     try testing.expect(a.magnitude() == 2);
     try testing.expect(b.magnitude() == 2);
-
+    try testing.expect(c.square() == 50);
 }
 
 // end math.zig

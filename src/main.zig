@@ -16,6 +16,7 @@ var video_buffer: ByteList = ByteList.init(alloc);
 
 
 fn mandelbrot(comptime T: anytype, Z: *T, C: *T) u8 {
+    // Z(n+1) = Z*Z + C
     var iter: u8 = 0;
     while ((iter < 255) and (Z.square() < 4.0)) : (iter += 1){
         Z.mul(Z);
@@ -42,9 +43,10 @@ fn render(comptime T: anytype) void {
     var y: u32 = 0;
 
     var Z: T = T.init(0, 0);
-    var C: T = T.init(-2, -1.12); // fill with values
+    var C: T = T.init(-2, 1.12); // fill with values
 
     var iters: u8 = 0;
+    iters = 0;
 
     while (y < HEIGHT) : (y += 1) {
         x = 0;
@@ -55,7 +57,10 @@ fn render(comptime T: anytype) void {
             setPixel(x, y, iters);
             C.add(&x_bump);
         }
-        C.add(&y_bump);
+        // typewriter sling the C.real value back to it's initial left side
+        C.real = -2;
+        // then bump the C.imag value down by it's bump value
+        C.sub(&y_bump);
     }
     return;
 }
@@ -91,5 +96,19 @@ export fn handle_onresize() void {}
 export fn update() void {}
 export fn handle_onclick(x: i32, y: i32) void { _ = x; _ = y;}
 export fn handle_onrelease(x: i32, y: i32) void { _ = x; _ = y;}
+
+
+test "Does Mandelbrot() actually work?" {
+    const C64 = complex.makeComplex(f64);
+    var Z = C64.init(0, 0);
+    var C = C64.init(-1, 1);
+    var res = mandelbrot(C64, &Z, &C);
+    try std.testing.expect(res == 3);
+
+    var Z2 = C64.init(0, 0);
+    var C2 = C64.init(-0.1, 0.01);
+    var res2 = mandelbrot(C64, &Z2, &C2);
+    try std.testing.expect(res2 == 255);
+}
 
 // end main.zig
