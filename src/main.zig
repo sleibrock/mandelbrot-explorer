@@ -14,6 +14,17 @@ const BUFSIZE: u32 = WIDTH * HEIGHT * 4;
 const ByteList = std.ArrayList(u8);
 var video_buffer: ByteList = ByteList.init(alloc);
 
+const Zone = struct {
+    x1: f64,
+    y1: f64,
+    x2: f64,
+    y2: f64,
+
+    pub fn init(x1: f64, y1: f64, x2: f64, y2: f64) Zone {
+        return .{ .x1 = x1, .y1 = y1, .x2 = x2, .y2 = y2 };
+    }
+};
+
 
 fn mandelbrot(comptime T: anytype, Z: *T, C: *T) u8 {
     // Z(n+1) = Z*Z + C
