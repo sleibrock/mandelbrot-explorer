@@ -1,23 +1,28 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <title>Mandelbrot Explorer</title>
-    <style>
-      body {
-	  background-color: black;
-	  color: white;
-	  width: 100%;
-      }
-    </style>
+    <meta charset="utf-8" />
+    <meta author="Steven Leibrock" />
+    <meta description="A Mandelbrot Fractal explorer" />
+    <link rel="stylesheet" href="assets/style.css" />
   </head>
   <body>
+    <div id="controls_bar">
+      <span id="controls_bar_text">Mandelbrot Explorer</span>
+      <span id="controls_bar_options">
+	<select id="fractal_type_select">
+	  <option>Mandelbrot</option>
+	  <!--<option>Julia</option>-->
+	</select>
+      </span>
+    </div>
     <div id="cnvdiv">
-      <h3>Mandelbrot Explorer</h3>
       <canvas id="output_cnv" width="640" height="480">
 	Browser does not support HTML5 canvas element
       </canvas>
       <br/>
     </div>
   </body>
-  <script src="src/loader.js"></script>
+  <script type="text/javascript" src="src/loader.js"></script>
 </html>

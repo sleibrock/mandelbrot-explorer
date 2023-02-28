@@ -59,7 +59,7 @@ window.document.body.onload = function() {
 	    var numc = App.zig.handle_onclick(sx, sy);
 	    console.log({num_filled: numc});
 	    update();
-	})
+	});
 
 	initialize();
 	update();

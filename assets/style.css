@@ -1,0 +1,27 @@
+/* style sheet for mandelbrot explorer */
+
+body {
+    background-color: black;
+    color: white;
+    width: 100%;
+    margin: 0 auto;
+}
+
+#controls_bar {
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: white;
+    height: 30px;
+    width: 100%;
+}
+
+#controls_bar_text {
+    display: inline;
+}
+
+#controls_bar_options {
+    float: right;
+    display: inline;
+}
+
+/* end css */
