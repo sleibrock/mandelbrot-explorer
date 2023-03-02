@@ -1,23 +1,26 @@
 const std = @import("std");
+const math = std.math;
 const alloc = std.heap.page_allocator;
 const complex = @import("complex.zig");
+const canvas = @import("canvas.zig");
 
 
 const Complex64 = complex.makeComplex(f64);
 //const Complex128 = complex.makeComplex(f128);
 
-const WIDTH: u32 = 640;
-const HEIGHT: u32 = 480;
 
-const BUFSIZE: u32 = WIDTH * HEIGHT * 4;
+const CanvasT = canvas.makeVCanvas(alloc);
+var cnv = CanvasT.init();
 
-const ByteList = std.ArrayList(u8);
-var video_buffer: ByteList = ByteList.init(alloc);
+fn abs64(x: f64) f64 {
+    if (x < 0) {
+        return x * -1;
+    }
+    return x;
+}
 
-const Viewport = struct {
-    width: u32,
-    height: u32,
-};
+
+
 
 const Domain = struct {
     x1: f64,
@@ -30,6 +33,8 @@ const Domain = struct {
     }
 };
 
+var domain = Domain.init(-2.0, 1.12, 0.47, 1.12);
+
 
 fn mandelbrot(comptime T: anytype, Z: *T, C: *T) u8 {
     // Z(n+1) = Z*Z + C
@@ -41,40 +46,34 @@ fn mandelbrot(comptime T: anytype, Z: *T, C: *T) u8 {
     return iter;
 }
 
-pub fn setPixel(x: u32, y: u32, f: u8) void {
-    const pos = ((y * WIDTH) + x) * 4;
-    video_buffer.items[pos] = f;
-    video_buffer.items[pos + 1] = f;
-    video_buffer.items[pos + 2] = f;
-    return;
-}
 
-
-fn render(comptime T: anytype) void {
+fn render64(dom: *Domain) void {
     // render the whole picture
     // render from (-2 ... 0.47), (-1.12 ... 1.12)
-    var x_bump: T = T.init(0.0038, 0);
-    var y_bump: T = T.init(0, 0.0046);
+    const x_inc = abs64(dom.x1) + abs64(dom.x2) / @intToFloat(f64, cnv.width);
+    const y_inc = abs64(dom.y1) + abs64(dom.y2) / @intToFloat(f64, cnv.height);
+    var x_bump = Complex64.init(x_inc, 0);
+    var y_bump = Complex64.init(0, y_inc);
     var x: u32 = 0;
     var y: u32 = 0;
 
-    var Z: T = T.init(0, 0);
-    var C: T = T.init(-2, 1.12); // fill with values
+    var Z = Complex64.init(0, 0);
+    var C = Complex64.init(dom.x1, dom.y1);
 
     var iters: u8 = 0;
     iters = 0;
 
-    while (y < HEIGHT) : (y += 1) {
+    while (y < cnv.height) : (y += 1) {
         x = 0;
-        while (x < WIDTH) : (x += 1) {
+        while (x < cnv.width) : (x += 1) {
             Z.real = 0;
             Z.imag = 0;
             iters = mandelbrot(Complex64, &Z, &C);
-            setPixel(x, y, iters);
+            cnv.setPixel(x, y, iters, iters, iters);
             C.add(&x_bump);
         }
-        // typewriter sling the C.real value back to it's initial left side
-        C.real = -2;
+        // sling the C.real value back to it's initial left side
+        C.real = dom.x1;
         // then bump the C.imag value down by it's bump value
         C.sub(&y_bump);
     }
@@ -82,30 +81,21 @@ fn render(comptime T: anytype) void {
 }
 
 
-export fn init(w: u32, h: u32) u32 {
+export fn init(w: u32, h: u32) u64 {
     // reserve memory for the output picture
-    var size = w * h * 4;
-    video_buffer.resize(size) catch |err| {
-        switch (err) {
-            else => { return 0; },
-        }
-    };
-    var index: usize = 0;
-    while (index < size) {
-        video_buffer.items[index] = 0;
-        video_buffer.items[index + 1] = 0;
-        video_buffer.items[index + 2] = 0;
-        video_buffer.items[index + 3] = 255;
-        index += 4;
+    var size = cnv.resize(w, h);
+    if (size == 0) {
+        return 0;
     }
-    render(Complex64);
+    cnv.fillBuffer(255);
+    render64(&domain);
     return size;
 }
 
-export fn getWidth() u32 { return WIDTH; }
-export fn getHeight() u32 { return HEIGHT; }
-export fn getSize() u32 { return BUFSIZE; }
-export fn startAddr() *u8 { return &video_buffer.items[0]; }
+export fn getWidth() usize { return cnv.width; }
+export fn getHeight() usize { return cnv.height; }
+export fn getSize() usize { return cnv.buffer_size; }
+export fn startAddr() *u8 { return &cnv.buffer.items[0]; }
 
 
 export fn handle_onresize() void {}
@@ -113,6 +103,12 @@ export fn update() void {}
 export fn handle_onclick(x: i32, y: i32) void { _ = x; _ = y;}
 export fn handle_onrelease(x: i32, y: i32) void { _ = x; _ = y;}
 
+
+test "Does abs work?" {
+    var x: f64 = -1;
+    var y: f64 = abs64(x);
+    try std.testing.expect(y == 1.0);
+}
 
 test "Does Mandelbrot() actually work?" {
     const C64 = complex.makeComplex(f64);

@@ -1,7 +1,9 @@
 // loader.js
 
+var cnvdiv = window.document.getElementById("cnvdiv");
 var cnv = window.document.getElementById("output_cnv");
 var ctx = cnv.getContext('2d');
+var the_button = window.document.getElementById("the_button")
 
 
 var App = {
@@ -23,10 +25,12 @@ var initialize = function() {
     App.img = new ImageData(
 	App.array, App.zig.getWidth(), App.zig.getHeight()
     );
+    return;
 }
 
 var update = function() {
     ctx.putImageData(App.img, 0, 0);
+    return;
 };
 
 window.document.body.onload = function() {
@@ -46,8 +50,8 @@ window.document.body.onload = function() {
 
 	// bind an on-click event for the canvas
 	cnv.addEventListener('click', (evt) => {
-	    var rect = cnv.getBoundingClientRect();
 	    console.log(evt);
+	    var rect = cnv.getBoundingClientRect();
 	    var w_ratio = (rect.width / 480);
 	    var h_ratio = (rect.height / 480);
 	    var x = evt.clientX - rect.left;
@@ -59,6 +63,28 @@ window.document.body.onload = function() {
 	    var numc = App.zig.handle_onclick(sx, sy);
 	    console.log({num_filled: numc});
 	    update();
+	});
+
+	window.addEventListener('resize', (evt) => {
+	    console.log(evt);
+	    var rect = cnvdiv.getBoundingClientRect();
+	    cnv.width = rect.width;
+	    cnv.height = rect.height;
+	    if (App.loaded) {
+		// do logic here w/ resizing
+		update();
+	    }
+	});
+
+	the_button.addEventListener('click', (evt) => {
+	    console.log("Button got clicked!!!");
+	    if (App.loaded) {
+		console.log(cnv.width + " x " + cnv.height);
+		var res = App.zig.init(cnv.width, cnv.height);
+		console.log("Button update: " + res);
+		initialize();
+		update();
+	    }
 	});
 
 	initialize();
