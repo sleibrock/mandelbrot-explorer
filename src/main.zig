@@ -12,15 +12,12 @@ const Complex64 = complex.makeComplex(f64);
 const CanvasT = canvas.makeVCanvas(alloc);
 var cnv = CanvasT.init();
 
-fn abs64(x: f64) f64 {
+fn abs(comptime T: anytype, x: T) T {
     if (x < 0) {
         return x * -1;
     }
     return x;
 }
-
-
-
 
 const Domain = struct {
     x1: f64,
@@ -33,7 +30,7 @@ const Domain = struct {
     }
 };
 
-var domain = Domain.init(-2.0, 1.12, 0.47, 1.12);
+var domain = Domain.init(-2.0, 1.12, 0.47, -1.12);
 
 
 fn mandelbrot(comptime T: anytype, Z: *T, C: *T) u8 {
@@ -47,18 +44,18 @@ fn mandelbrot(comptime T: anytype, Z: *T, C: *T) u8 {
 }
 
 
-fn render64(dom: *Domain) void {
+fn render(comptime T: anytype, dom: *Domain) void {
     // render the whole picture
     // render from (-2 ... 0.47), (-1.12 ... 1.12)
-    const x_inc = abs64(dom.x1) + abs64(dom.x2) / @intToFloat(f64, cnv.width);
-    const y_inc = abs64(dom.y1) + abs64(dom.y2) / @intToFloat(f64, cnv.height);
-    var x_bump = Complex64.init(x_inc, 0);
-    var y_bump = Complex64.init(0, y_inc);
+    const x_inc = abs(f64, dom.x1 - dom.x2) / @intToFloat(f64, cnv.width);
+    const y_inc = abs(f64, dom.y1 - dom.y2) / @intToFloat(f64, cnv.height);
+    var x_bump = T.init(x_inc, 0);
+    var y_bump = T.init(0, y_inc);
     var x: u32 = 0;
     var y: u32 = 0;
 
-    var Z = Complex64.init(0, 0);
-    var C = Complex64.init(dom.x1, dom.y1);
+    var Z = T.init(0, 0);
+    var C = T.init(dom.x1, dom.y1);
 
     var iters: u8 = 0;
     iters = 0;
@@ -88,7 +85,7 @@ export fn init(w: u32, h: u32) u64 {
         return 0;
     }
     cnv.fillBuffer(255);
-    render64(&domain);
+    render(Complex64, &domain);
     return size;
 }
 
@@ -106,7 +103,7 @@ export fn handle_onrelease(x: i32, y: i32) void { _ = x; _ = y;}
 
 test "Does abs work?" {
     var x: f64 = -1;
-    var y: f64 = abs64(x);
+    var y: f64 = abs(f64, x);
     try std.testing.expect(y == 1.0);
 }
 

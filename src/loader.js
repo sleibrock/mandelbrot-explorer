@@ -39,8 +39,13 @@ window.document.body.onload = function() {
     WebAssembly.instantiateStreaming(fetch("main.wasm"), {
     }).then(res => {
 	console.log("WASM loaded");
+
+	console.log("Setting canvas resolution")
+	var rect = cnvdiv.getBoundingClientRect();
+	cnv.width = rect.width;
+	cnv.height = rect.height;
 	App.zig = res.instance.exports;
-	var res = App.zig.init(640, 480);
+	var res = App.zig.init(cnv.width, cnv.height);
 	console.log("Memory allocated: " + res);
 	if (res == 0) {
 	    console.log("Failed to allocate memory");
@@ -66,8 +71,8 @@ window.document.body.onload = function() {
 	});
 
 	window.addEventListener('resize', (evt) => {
-	    console.log(evt);
 	    var rect = cnvdiv.getBoundingClientRect();
+	    console.log(rect);
 	    cnv.width = rect.width;
 	    cnv.height = rect.height;
 	    if (App.loaded) {
