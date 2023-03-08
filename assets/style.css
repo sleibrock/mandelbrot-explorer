@@ -33,4 +33,14 @@ body {
     display: inline;
 }
 
+@media screen and (max-width: 600px) {
+    body {
+	width: 100% !important;
+	margin: 0px !important;
+    }
+    canvas {
+	width: 100% !important;
+    }
+}
+
 /* end css */

@@ -89,6 +89,24 @@ export fn init(w: u32, h: u32) u64 {
     return size;
 }
 
+export fn reset() void {
+    domain.x1 = -2;
+    domain.x2 = 0.47;
+    domain.y1 = 1.12;
+    domain.y2 = -1.12;
+}
+
+export fn setViewport(x1: u32, y1: u32, x2: u32, y2: u32) bool {
+    // attempt to scale the viewport client to a new domain
+    // do this by scaling the coordinates based on the current
+    // canvas and converting (x,y) to complex coordinates
+    _ = x1;
+    _ = y1;
+    _ = x2;
+    _ = y2;
+    return true;
+}
+
 export fn getWidth() usize { return cnv.width; }
 export fn getHeight() usize { return cnv.height; }
 export fn getSize() usize { return cnv.buffer_size; }

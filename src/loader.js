@@ -5,7 +5,6 @@ var cnv = window.document.getElementById("output_cnv");
 var ctx = cnv.getContext('2d');
 var the_button = window.document.getElementById("the_button")
 
-
 var App = {
     zig: null,
     loaded: false,
