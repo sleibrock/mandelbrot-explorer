@@ -17,6 +17,7 @@ body {
 }
 
 #controls_bar {
+    padding: 2px;
     border-bottom-style: solid;
     border-bottom-width: 1px;
     border-bottom-color: white;

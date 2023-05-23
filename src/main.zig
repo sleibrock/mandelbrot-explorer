@@ -78,7 +78,7 @@ fn render(comptime T: anytype, dom: *Domain) void {
 }
 
 
-export fn init(w: u32, h: u32) u64 {
+pub export fn init(w: u32, h: u32) u64 {
     // reserve memory for the output picture
     var size = cnv.resize(w, h);
     if (size == 0) {
@@ -89,14 +89,14 @@ export fn init(w: u32, h: u32) u64 {
     return size;
 }
 
-export fn reset() void {
+pub export fn reset() void {
     domain.x1 = -2;
-    domain.x2 = 0.47;
+    domain.x2 = 0.57;
     domain.y1 = 1.12;
     domain.y2 = -1.12;
 }
 
-export fn setViewport(x1: u32, y1: u32, x2: u32, y2: u32) bool {
+pub export fn setViewport(x1: u32, y1: u32, x2: u32, y2: u32) bool {
     // attempt to scale the viewport client to a new domain
     // do this by scaling the coordinates based on the current
     // canvas and converting (x,y) to complex coordinates
@@ -107,16 +107,19 @@ export fn setViewport(x1: u32, y1: u32, x2: u32, y2: u32) bool {
     return true;
 }
 
-export fn getWidth() usize { return cnv.width; }
-export fn getHeight() usize { return cnv.height; }
-export fn getSize() usize { return cnv.buffer_size; }
-export fn startAddr() *u8 { return &cnv.buffer.items[0]; }
+pub export fn getWidth() usize { return cnv.width; }
+pub export fn getHeight() usize { return cnv.height; }
+pub export fn getSize() usize { return cnv.buffer_size; }
+pub export fn startAddr() *u8 { return &cnv.buffer.items[0]; }
 
 
-export fn handle_onresize() void {}
-export fn update() void {}
-export fn handle_onclick(x: i32, y: i32) void { _ = x; _ = y;}
-export fn handle_onrelease(x: i32, y: i32) void { _ = x; _ = y;}
+pub export fn handle_onresize(w: u32, h: u32) usize {
+    return cnv.resize(w, h);
+}
+
+pub export fn update() void {}
+pub export fn handle_onclick(x: i32, y: i32) void { _ = x; _ = y;}
+pub export fn handle_onrelease(x: i32, y: i32) void { _ = x; _ = y;}
 
 
 test "Does abs work?" {
